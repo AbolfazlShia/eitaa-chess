@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState, useCallback } from 'react';
+import React, { useEffect, useRef, useState, useCallback } from 'react';
 import type { Socket } from 'socket.io-client';
 import {
 	makeInitialBoard,
@@ -22,14 +22,14 @@ type Props = {
 };
 
 type Timer = {
-	white: number; // seconds
+	white: number;
 	black: number;
 	lastUpdate: number;
 	turn: 'w' | 'b';
 };
 
-const INITIAL_TIME = 10 * 60; // 10 minutes
-const INCREMENT = 2; // 2 seconds per move
+const INITIAL_TIME = 10 * 60;
+const INCREMENT = 2;
 
 export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 	const [board, setBoard] = useState<BoardState>(() => makeInitialBoard());
@@ -48,6 +48,7 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 		turn: 'w'
 	}));
 	const [promotionSquare, setPromotionSquare] = useState<string | null>(null);
+	const aiProcessingRef = useRef(false);
 
 	const isMultiplayer = route.mode === 'invite' || route.mode === 'random';
 	const gameStatus = getGameStatus(board);
@@ -84,6 +85,7 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 		if (!isMultiplayer) {
 			setStatus('نوبت شما');
 			setIsMyTurn(true);
+			setMyColor('w');
 			return;
 		}
 
@@ -96,23 +98,12 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 
 		const onLive = (data: { whiteId?: string; blackId?: string; white?: any; black?: any }) => {
 			setStatus('بازی شروع شد!');
-			// Determine my color - we'll get this from server or determine from opponent
-			const params = new URLSearchParams(location.search);
-			const myEitaaId = params.get('eitaa_id');
-			// Server will tell us via opponent info which side we are
 		};
 
 		const onMove = ({ move, fen, turn }: any) => {
-			// Load board from FEN received from server
 			if (fen) {
 				const loaded = loadBoardFromFEN(fen);
 				setBoard(loaded);
-			} else {
-				// Fallback: try to make move
-				const result = moveOnBoard(board, move.from, move.to, move.promotion);
-				if (result.ok && result.board) {
-					setBoard(result.board);
-				}
 			}
 			const nextTurn = turn === 'w' ? 'b' : 'w';
 			setIsMyTurn(nextTurn === myColor);
@@ -126,10 +117,9 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 
 		const onOpponent = (data: { name: string; avatarUrl?: string; myColor?: 'w' | 'b' }) => {
 			setOpponent({ name: data.name, avatarUrl: data.avatarUrl });
-			// Set my color from server
 			if (data.myColor) {
 				setMyColor(data.myColor);
-				setIsMyTurn(data.myColor === 'w'); // White starts
+				setIsMyTurn(data.myColor === 'w');
 			}
 		};
 
@@ -148,7 +138,7 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 			socket.off('opponent:info', onOpponent);
 			socket.off('match:finished', onFinished);
 		};
-	}, [socket, route.matchId, isMultiplayer, board, myColor]);
+	}, [socket, route.matchId, isMultiplayer, myColor]);
 
 	// Game status updates
 	useEffect(() => {
@@ -161,17 +151,17 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 					reason: 'checkmate'
 				});
 			} else if (route.mode === 'single' && gameStatus.winner === 'w') {
-				// Claim win reward
+				const params = new URLSearchParams(location.search);
 				fetch('/api/single/win', {
 					method: 'POST',
 					headers: { 'Content-Type': 'application/json' },
 					body: JSON.stringify({
-						eitaaId: new URLSearchParams(location.search).get('eitaa_id'),
-						name: new URLSearchParams(location.search).get('name'),
-						avatarUrl: new URLSearchParams(location.search).get('avatar_url'),
+						eitaaId: params.get('eitaa_id'),
+						name: params.get('name'),
+						avatarUrl: params.get('avatar_url'),
 						level: aiLevel
 					})
-				});
+				}).catch(console.error);
 			}
 		} else if (gameStatus.isStalemate || gameStatus.isDraw) {
 			setGameOver({ reason: gameStatus.isStalemate ? 'پات' : 'مساوی' });
@@ -193,65 +183,89 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 		}
 	}, [selected, board]);
 
-	// AI move
+	// AI move - Fixed with proper dependency management
 	useEffect(() => {
-		if (route.mode === 'single' && !isMyTurn && !gameOver && gameStatus.turn === 'b') {
-			// Small delay for better UX
-			const timeout = setTimeout(() => {
-				getAIMove(board, aiLevel).then((move) => {
-					if (move) {
-						const result = moveOnBoard(board, move.from, move.to, move.promotion as any);
-						if (result.ok && result.board) {
-							setBoard(result.board);
-							setIsMyTurn(true);
-						}
+		if (route.mode !== 'single') return;
+		if (gameOver) return;
+		if (isMyTurn) return;
+		if (gameStatus.turn !== 'b') return;
+		if (aiProcessingRef.current) return;
+
+		aiProcessingRef.current = true;
+		setStatus('در حال فکر کردن...');
+
+		const timeout = setTimeout(() => {
+			getAIMove(board, aiLevel)
+				.then((move) => {
+					if (move && !gameOver) {
+						setBoard((currentBoard) => {
+							const result = moveOnBoard(currentBoard, move.from, move.to, move.promotion as any);
+							if (result.ok && result.board) {
+								setIsMyTurn(true);
+								setStatus('نوبت شما');
+								return result.board;
+							}
+							return currentBoard;
+						});
 					}
+					aiProcessingRef.current = false;
+				})
+				.catch((err) => {
+					console.error('AI error:', err);
+					aiProcessingRef.current = false;
 				});
-			}, 500);
-			return () => clearTimeout(timeout);
-		}
-	}, [isMyTurn, route.mode, board, aiLevel, gameOver, gameStatus.turn]);
+		}, 500);
+
+		return () => {
+			clearTimeout(timeout);
+			aiProcessingRef.current = false;
+		};
+	}, [isMyTurn, route.mode, board.fen, aiLevel, gameOver, gameStatus.turn]);
 
 	const doMove = useCallback(
 		(from: string, to: string, promotion?: 'q' | 'r' | 'b' | 'n') => {
 			if (!isMyTurn && isMultiplayer) return;
 			if (gameOver) return;
 
-			const result = moveOnBoard(board, from, to, promotion);
-			if (!result.ok || !result.board) {
+			setBoard((currentBoard) => {
+				const result = moveOnBoard(currentBoard, from, to, promotion);
+				if (!result.ok || !result.board) {
+					setSelected(null);
+					return currentBoard;
+				}
+
+				// Check for promotion
+				const fromRank = parseInt(from[1]);
+				const toRank = parseInt(to[1]);
+				const piece = getPieceAt(currentBoard, from);
+				if (piece && piece.includes('p') && ((piece.startsWith('w') && toRank === 8) || (piece.startsWith('b') && toRank === 1))) {
+					setPromotionSquare(to);
+					return currentBoard;
+				}
+
+				// Make the move
+				setIsMyTurn(false);
 				setSelected(null);
-				return;
-			}
 
-			// Check for promotion - need to check if pawn reaches last rank
-			const fromRank = parseInt(from[1]);
-			const toRank = parseInt(to[1]);
-			const piece = getPieceAt(board, from);
-			if (piece && piece.includes('p') && ((piece.startsWith('w') && toRank === 8) || (piece.startsWith('b') && toRank === 1))) {
-				setPromotionSquare(to);
-				return;
-			}
+				if (isMultiplayer && route.matchId) {
+					socket.emit('move', {
+						matchId: route.matchId,
+						move: { from, to, promotion },
+						fen: serializeFEN(result.board),
+						turn: gameStatus.turn === 'w' ? 'b' : 'w'
+					});
+					setTimer((t) => ({
+						...t,
+						turn: t.turn === 'w' ? 'b' : 'w',
+						lastUpdate: Date.now(),
+						[t.turn === 'w' ? 'white' : 'black']: t[t.turn === 'w' ? 'white' : 'black'] + INCREMENT
+					}));
+				}
 
-			setBoard(result.board);
-			setIsMyTurn(false);
-			setSelected(null);
-
-			if (isMultiplayer && route.matchId) {
-				socket.emit('move', {
-					matchId: route.matchId,
-					move: { from, to, promotion },
-					fen: serializeFEN(result.board),
-					turn: gameStatus.turn === 'w' ? 'b' : 'w'
-				});
-				setTimer((t) => ({
-					...t,
-					turn: t.turn === 'w' ? 'b' : 'w',
-					lastUpdate: Date.now(),
-					[t.turn === 'w' ? 'white' : 'black']: t[t.turn === 'w' ? 'white' : 'black'] + INCREMENT
-				}));
-			}
+				return result.board;
+			});
 		},
-		[board, isMyTurn, isMultiplayer, route.matchId, socket, gameStatus.turn, gameOver]
+		[isMyTurn, isMultiplayer, route.matchId, socket, gameStatus.turn, gameOver]
 	);
 
 	const onSquareClick = (square: string) => {
@@ -269,7 +283,6 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 			} else if (legalMoves.includes(square)) {
 				doMove(selected, square);
 			} else {
-				// Try selecting new piece
 				const piece = getPieceAt(board, square);
 				if (piece && ((piece.startsWith('w') && gameStatus.turn === 'w') || (piece.startsWith('b') && gameStatus.turn === 'b'))) {
 					setSelected(square);
@@ -347,7 +360,7 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 									value={aiLevel}
 									onChange={(e) => setAiLevel(Number(e.target.value))}
 									className="level-select"
-									disabled={!isMyTurn}
+									disabled={!isMyTurn || !!gameOver}
 								>
 									<option value={1}>آسان</option>
 									<option value={2}>متوسط-</option>
@@ -364,13 +377,15 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 						</div>
 					</div>
 
-					<Board
-						board={board}
-						selected={selected}
-						legalMoves={legalMoves}
-						onSquareClick={onSquareClick}
-						flipped={myColor === 'b'}
-					/>
+					<div className="board-wrapper">
+						<Board
+							board={board}
+							selected={selected}
+							legalMoves={legalMoves}
+							onSquareClick={onSquareClick}
+							flipped={myColor === 'b'}
+						/>
+					</div>
 
 					{promotionSquare && (
 						<div className="promotion-modal">
@@ -474,7 +489,7 @@ const Board: React.FC<{
 					onClick={() => onSquareClick(square)}
 				>
 					{piece && <div className="piece">{pieceToGlyph(piece.piece)}</div>}
-					{isLegal && <div className="legal-marker" />}
+					{isLegal && !piece && <div className="legal-marker" />}
 				</div>
 			);
 		}

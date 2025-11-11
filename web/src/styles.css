@@ -350,6 +350,15 @@ p {
 	display: flex;
 	flex-direction: column;
 	gap: 20px;
+	align-items: center;
+}
+
+.board-wrapper {
+	width: 100%;
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	padding: 20px;
 }
 
 .game-info {
