@@ -1,0 +1,13 @@
+[build]
+  command = "cd web && pnpm install && pnpm build"
+  publish = "web/dist"
+  base = "."
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+[build.environment]
+  VITE_API_URL = "https://chba-chred.onrender.com"
+  NODE_VERSION = "18"
