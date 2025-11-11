@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>مار بازی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="app">
+    <header class="header">
+      <h1>مار بازی</h1>
+      <div class="stats">
+        <div class="stat"><span>امتیاز:</span><strong id="score">0</strong></div>
+        <div class="stat"><span>رکورد:</span><strong id="highscore">0</strong></div>
+        <button id="pauseBtn" class="btn">⏸︎ مکث</button>
+        <button id="restartBtn" class="btn btn-primary">↻ شروع دوباره</button>
+      </div>
+    </header>
+
+    <main class="board-wrap">
+      <canvas id="board" width="560" height="560" aria-label="صفحه بازی" role="img"></canvas>
+      <div class="mobile-controls" aria-hidden="false">
+        <button class="pad up" data-dir="up" aria-label="بالا">▲</button>
+        <div class="pad-row">
+          <button class="pad left" data-dir="left" aria-label="چپ">◀</button>
+          <button class="pad right" data-dir="right" aria-label="راست">▶</button>
+        </div>
+        <button class="pad down" data-dir="down" aria-label="پایین">▼</button>
+      </div>
+    </main>
+
+    <section class="help">
+      <details>
+        <summary>راهنما</summary>
+        <ul>
+          <li>کلیدهای جهت‌نما یا W/A/S/D برای حرکت</li>
+          <li>Space برای مکث/ادامه</li>
+          <li>برای موبایل از کنترل‌ها استفاده کنید</li>
+        </ul>
+      </details>
+    </section>
+  </div>
+
+  <script src="./script.js"></script>
+</body>
+</html>
+
+

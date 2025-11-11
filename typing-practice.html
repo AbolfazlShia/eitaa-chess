@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="fa" dir="rtl">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>تمرین تایپ ده انگشتی</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;600;800&display=swap" rel="stylesheet">
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: "Vazirmatn", system-ui, -apple-system, sans-serif;
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      min-height: 100vh;
+      padding: 20px;
+      color: #333;
+    }
+
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      background: white;
+      border-radius: 20px;
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+      color: white;
+      padding: 30px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 20px;
+    }
+
+    .header h1 {
+      font-size: 2em;
+      font-weight: 800;
+    }
+
+    .controls {
+      display: flex;
+      gap: 15px;
+      align-items: center;
+      flex-wrap: wrap;
+    }
+
+    .language-selector {
+      display: flex;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      padding: 5px;
+      gap: 5px;
+    }
+
+    .language-selector button {
+      padding: 10px 20px;
+      border: none;
+      background: transparent;
+      color: white;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: 600;
+      transition: all 0.3s;
+    }
+
+    .language-selector button.active {
+      background: white;
+      color: #667eea;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 10px;
+      cursor: pointer;
+      font-weight: 600;
+      font-size: 1em;
+      transition: all 0.3s;
+      font-family: "Vazirmatn", sans-serif;
+    }
+
+    .btn-primary {
+      background: white;
+      color: #667eea;
+    }
+
+    .btn-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    }
+
+    .btn-secondary {
+      background: rgba(255, 255, 255, 0.2);
+      color: white;
+    }
+
+    .btn-secondary:hover {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    .main-content {
+      display: grid;
+      grid-template-columns: 1fr 400px;
+      gap: 0;
+      min-height: 600px;
+    }
+
+    .practice-area {
+      padding: 40px;
+      background: #f8f9fa;
+    }
+
+    .text-display {
+      background: white;
+      border: 2px solid #e0e0e0;
+      border-radius: 15px;
+      padding: 30px;
+      min-height: 300px;
+      font-size: 24px;
+      line-height: 1.8;
+      font-family: "Courier New", monospace;
+      direction: ltr;
+      text-align: left;
+      margin-bottom: 30px;
+      overflow-y: auto;
+      max-height: 400px;
+    }
+
+    .typed-text {
+      color: #28a745;
+      font-weight: 600;
+    }
+
+    .current-char {
+      background: #007bff;
+      color: white;
+      padding: 2px 4px;
+      border-radius: 4px;
+      font-weight: bold;
+    }
+
+    .remaining-text {
+      color: #666;
+    }
+
+    .input-field {
+      width: 100%;
+      padding: 15px;
+      font-size: 18px;
+      border: 2px solid #e0e0e0;
+      border-radius: 10px;
+      font-family: "Courier New", monospace;
+      direction: ltr;
+      text-align: left;
+      opacity: 0;
+      position: absolute;
+      pointer-events: none;
+    }
+
+    .sidebar {
+      background: #2c3e50;
+      color: white;
+      padding: 30px;
+      display: flex;
+      flex-direction: column;
+      gap: 30px;
+    }
+
+    .stats-panel {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+    }
+
+    .stats-panel h2 {
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .stat-row {
+      display: flex;
+      justify-content: space-between;
+      padding: 12px 0;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .stat-row:last-child {
+      border-bottom: none;
+    }
+
+    .stat-label {
+      color: rgba(255, 255, 255, 0.8);
+    }
+
+    .stat-value {
+      font-weight: 700;
+      font-size: 1.1em;
+    }
+
+    .keyboard-panel {
+      background: rgba(255, 255, 255, 0.1);
+      border-radius: 15px;
+      padding: 25px;
+    }
+
+    .keyboard-panel h2 {
+      margin-bottom: 20px;
+      font-size: 1.5em;
+    }
+
+    .keyboard {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .keyboard-row {
+      display: flex;
+      gap: 4px;
+      justify-content: center;
+    }
+
+    .key {
+      min-width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(255, 255, 255, 0.2);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      border-radius: 6px;
+      font-size: 11px;
+      font-weight: 600;
+      color: white;
+    }
+
+    .key.wide {
+      min-width: 60px;
+    }
+
+    .key.wider {
+      min-width: 90px;
+    }
+
+    .key.widest {
+      min-width: 300px;
+    }
+
+    .key.pinky { background: rgba(255, 192, 203, 0.3); border-color: #ffc0cb; }
+    .key.ring { background: rgba(255, 165, 0, 0.3); border-color: #ffa500; }
+    .key.middle { background: rgba(255, 255, 0, 0.3); border-color: #ffff00; }
+    .key.index { background: rgba(0, 255, 0, 0.3); border-color: #00ff00; }
+    .key.thumb { background: rgba(0, 0, 255, 0.3); border-color: #0000ff; }
+
+    .legend {
+      margin-top: 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 15px;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .legend-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      border: 1px solid;
+    }
+
+    .legend-color.pinky { background: rgba(255, 192, 203, 0.3); border-color: #ffc0cb; }
+    .legend-color.ring { background: rgba(255, 165, 0, 0.3); border-color: #ffa500; }
+    .legend-color.middle { background: rgba(255, 255, 0, 0.3); border-color: #ffff00; }
+    .legend-color.index { background: rgba(0, 255, 0, 0.3); border-color: #00ff00; }
+    .legend-color.thumb { background: rgba(0, 0, 255, 0.3); border-color: #0000ff; }
+
+    .info-text {
+      text-align: center;
+      color: #666;
+      margin-top: 20px;
+      padding: 15px;
+      background: #fff3cd;
+      border-radius: 10px;
+      border: 1px solid #ffc107;
+    }
+
+    @media (max-width: 1200px) {
+      .main-content {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <h1>تمرین تایپ ده انگشتی</h1>
+      <div class="controls">
+        <div class="language-selector">
+          <button id="langPersian" class="active" onclick="changeLanguage('persian')">فارسی</button>
+          <button id="langEnglish" onclick="changeLanguage('english')">English</button>
+        </div>
+        <button class="btn btn-primary" onclick="startPractice()">شروع</button>
+        <button class="btn btn-secondary" onclick="resetPractice()">ریست</button>
+      </div>
+    </div>
+
+    <div class="main-content">
+      <div class="practice-area">
+        <h2 style="margin-bottom: 20px; color: #667eea;">متن تمرین:</h2>
+        <div class="text-display" id="textDisplay"></div>
+        <input type="text" class="input-field" id="inputField" autocomplete="off" spellcheck="false" />
+        <div class="info-text">
+          💡 برای شروع، روی دکمه "شروع" کلیک کنید و سپس شروع به تایپ کنید
+        </div>
+      </div>
+
+      <div class="sidebar">
+        <div class="stats-panel">
+          <h2>آمار</h2>
+          <div class="stat-row">
+            <span class="stat-label">سرعت:</span>
+            <span class="stat-value" id="wpm">0 WPM</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">دقت:</span>
+            <span class="stat-value" id="accuracy">100%</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">کاراکترهای صحیح:</span>
+            <span class="stat-value" id="correctChars">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">خطاها:</span>
+            <span class="stat-value" id="errors">0</span>
+          </div>
+          <div class="stat-row">
+            <span class="stat-label">کل کاراکترها:</span>
+            <span class="stat-value" id="totalChars">0</span>
+          </div>
+        </div>
+
+        <div class="keyboard-panel">
+          <h2>صفحه کلید</h2>
+          <div class="keyboard" id="keyboard"></div>
+          <div class="legend">
+            <div class="legend-item">
+              <div class="legend-color pinky"></div>
+              <span>انگشت کوچک</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color ring"></div>
+              <span>انگشت حلقه</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color middle"></div>
+              <span>انگشت وسط</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color index"></div>
+              <span>انگشت اشاره</span>
+            </div>
+            <div class="legend-item">
+              <div class="legend-color thumb"></div>
+              <span>انگشت شست</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Practice texts
+    const persianTexts = [
+      "سلام، این یک متن تمرینی برای تایپ ده انگشتی به زبان فارسی است. با تمرین مداوم می‌توانید سرعت و دقت تایپ خود را بهبود بخشید.",
+      "برنامه‌نویسی یکی از مهارت‌های مهم در دنیای امروز است. یادگیری تایپ سریع و دقیق می‌تواند به شما کمک کند تا کارهای خود را سریع‌تر انجام دهید.",
+      "تمرین تایپ ده انگشتی نیاز به صبر و حوصله دارد. هر روز چند دقیقه وقت بگذارید و به تدریج پیشرفت خود را مشاهده خواهید کرد.",
+      "کامپیوتر و اینترنت بخش مهمی از زندگی روزمره ما شده‌اند. تایپ سریع می‌تواند در کار و تحصیل به شما کمک زیادی کند.",
+      "زبان فارسی یکی از زیباترین زبان‌های جهان است. با تمرین تایپ می‌توانید ارتباطات خود را بهبود بخشید."
+    ];
+
+    const englishTexts = [
+      "The quick brown fox jumps over the lazy dog. This sentence contains every letter of the alphabet and is perfect for typing practice.",
+      "Practice makes perfect. The more you type, the better you will become at touch typing. Keep practicing every day to improve your speed and accuracy.",
+      "Touch typing is a skill that requires patience and dedication. With regular practice, you can learn to type without looking at the keyboard.",
+      "Technology has become an essential part of our daily lives. Learning to type quickly and accurately can help you work more efficiently.",
+      "Programming and software development require good typing skills. Practice touch typing to become a better developer and improve your productivity."
+    ];
+
+    let currentLanguage = 'persian';
+    let currentText = '';
+    let userInput = '';
+    let currentIndex = 0;
+    let isActive = false;
+    let startTime = null;
+    let errors = 0;
+    let totalCharacters = 0;
+    let correctCharacters = 0;
+
+    // Initialize keyboard
+    function initKeyboard() {
+      const keyboard = document.getElementById('keyboard');
+      const rows = [
+        { keys: ['`', '1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='] },
+        { keys: ['Tab', 'q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', '[', ']', '\\'], wide: ['Tab', '\\'] },
+        { keys: ['Caps', 'a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', ';', "'", 'Return'], wide: ['Caps'], wider: ['Return'] },
+        { keys: ['Shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', ',', '.', '/', 'Shift'], wider: ['Shift'] },
+        { keys: ['Ctrl', 'Option', 'Cmd', 'Space', 'Cmd', 'Option'], wide: ['Ctrl', 'Option', 'Cmd'], widest: ['Space'] }
+      ];
+
+      rows.forEach(row => {
+        const rowDiv = document.createElement('div');
+        rowDiv.className = 'keyboard-row';
+        
+        row.keys.forEach(key => {
+          const keyDiv = document.createElement('div');
+          keyDiv.className = 'key ' + getFingerClass(key);
+          if (row.wide && row.wide.includes(key)) keyDiv.classList.add('wide');
+          if (row.wider && row.wider.includes(key)) keyDiv.classList.add('wider');
+          if (row.widest && row.widest.includes(key)) keyDiv.classList.add('widest');
+          keyDiv.textContent = key;
+          rowDiv.appendChild(keyDiv);
+        });
+        
+        keyboard.appendChild(rowDiv);
+      });
+    }
+
+    function getFingerClass(key) {
+      const lowerKey = key.toLowerCase();
+      if (['`', '1', 'q', 'a', 'z', 'tab', 'caps', 'shift', 'ctrl', 'option'].includes(lowerKey)) return 'pinky';
+      if (['2', 'w', 's', 'x'].includes(lowerKey)) return 'ring';
+      if (['3', 'e', 'd', 'c'].includes(lowerKey)) return 'middle';
+      if (['4', '5', 'r', 't', 'f', 'g', 'v', 'b', '6', '7', 'y', 'u', 'h', 'j', 'n', 'm'].includes(lowerKey)) return 'index';
+      if (['8', 'i', 'k', ','].includes(lowerKey)) return 'middle';
+      if (['9', 'o', 'l', '.'].includes(lowerKey)) return 'ring';
+      if (['0', '-', '=', 'p', '[', ']', ';', "'", '/', '\\', 'return'].includes(lowerKey)) return 'pinky';
+      if (['space', 'cmd'].includes(lowerKey)) return 'thumb';
+      return 'pinky';
+    }
+
+    function changeLanguage(lang) {
+      currentLanguage = lang;
+      document.getElementById('langPersian').classList.toggle('active', lang === 'persian');
+      document.getElementById('langEnglish').classList.toggle('active', lang === 'english');
+      resetPractice();
+      if (!isActive) {
+        currentText = getRandomText();
+        updateDisplay();
+      }
+    }
+
+    function getRandomText() {
+      const texts = currentLanguage === 'persian' ? persianTexts : englishTexts;
+      return texts[Math.floor(Math.random() * texts.length)];
+    }
+
+    function startPractice() {
+      currentText = getRandomText();
+      userInput = '';
+      currentIndex = 0;
+      isActive = true;
+      startTime = Date.now();
+      errors = 0;
+      totalCharacters = 0;
+      correctCharacters = 0;
+      updateDisplay();
+      document.getElementById('inputField').focus();
+    }
+
+    function resetPractice() {
+      isActive = false;
+      userInput = '';
+      currentIndex = 0;
+      startTime = null;
+      errors = 0;
+      totalCharacters = 0;
+      correctCharacters = 0;
+      updateDisplay();
+      document.getElementById('inputField').value = '';
+    }
+
+    function handleInput(e) {
+      if (!isActive) return;
+      
+      const input = e.target.value;
+      if (input.length > userInput.length) {
+        const newChar = input[input.length - 1];
+        processCharacter(newChar);
+      } else if (input.length < userInput.length) {
+        // User deleted, reset
+        userInput = input;
+        currentIndex = input.length;
+        updateDisplay();
+      }
+    }
+
+    function processCharacter(char) {
+      if (currentIndex >= currentText.length) {
+        isActive = false;
+        return;
+      }
+
+      const expectedChar = currentText[currentIndex];
+      
+      if (char === expectedChar) {
+        correctCharacters++;
+        currentIndex++;
+        userInput = currentText.substring(0, currentIndex);
+      } else {
+        errors++;
+      }
+      
+      totalCharacters++;
+      updateDisplay();
+      updateStats();
+
+      if (currentIndex >= currentText.length) {
+        isActive = false;
+      }
+    }
+
+    function updateDisplay() {
+      const display = document.getElementById('textDisplay');
+      let html = '';
+      
+      if (userInput.length > 0) {
+        html += '<span class="typed-text">' + escapeHtml(userInput) + '</span>';
+      }
+      
+      if (currentIndex < currentText.length) {
+        const currentChar = currentText[currentIndex];
+        const remaining = currentText.substring(currentIndex + 1);
+        html += '<span class="current-char">' + escapeHtml(currentChar) + '</span>';
+        html += '<span class="remaining-text">' + escapeHtml(remaining) + '</span>';
+      } else if (currentIndex === 0 && currentText.length > 0) {
+        const firstChar = currentText[0];
+        const remaining = currentText.substring(1);
+        html += '<span class="current-char">' + escapeHtml(firstChar) + '</span>';
+        html += '<span class="remaining-text">' + escapeHtml(remaining) + '</span>';
+      }
+      
+      display.innerHTML = html || '<span class="remaining-text">' + escapeHtml(currentText) + '</span>';
+    }
+
+    function updateStats() {
+      if (!startTime) return;
+      
+      const elapsed = (Date.now() - startTime) / 1000 / 60; // minutes
+      const wpm = elapsed > 0 ? Math.round((totalCharacters / 5) / elapsed) : 0;
+      const accuracy = totalCharacters > 0 ? Math.round((correctCharacters / totalCharacters) * 100) : 100;
+      
+      document.getElementById('wpm').textContent = wpm + ' WPM';
+      document.getElementById('accuracy').textContent = accuracy + '%';
+      document.getElementById('correctChars').textContent = correctCharacters;
+      document.getElementById('errors').textContent = errors;
+      document.getElementById('totalChars').textContent = totalCharacters;
+    }
+
+    function escapeHtml(text) {
+      const div = document.createElement('div');
+      div.textContent = text;
+      return div.innerHTML;
+    }
+
+    // Initialize
+    document.getElementById('inputField').addEventListener('input', handleInput);
+    document.getElementById('inputField').addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' || e.key === 'Escape') {
+        e.preventDefault();
+        resetPractice();
+      }
+    });
+
+    initKeyboard();
+    currentText = getRandomText();
+    updateDisplay();
+  </script>
+</body>
+</html>
+

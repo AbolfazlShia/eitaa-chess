@@ -1,0 +1,192 @@
+:root{
+  --bg-1:#0b0507;
+  --bg-2:#140707;
+  --bg-3:#190d0f;
+  --fg:#f4e6d8;
+  --accent:#ff9f43;
+  --accent-2:#ff5d2a;
+  --accent-3:#ffcf66;
+  --danger:#ff4d4d;
+  --panel:#1f1012;
+  --panel-border:rgba(255,119,51,.35);
+  --button:#2b1616;
+  --button-border:rgba(255,119,51,.4);
+}
+
+*{ box-sizing: border-box; }
+html,body{
+  margin:0;
+  padding:0;
+  height:100%;
+  font-family:"Vazirmatn", system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  color:var(--fg);
+  background:
+    radial-gradient(800px 500px at 10% 15%, rgba(255,140,66,.35), transparent 70%),
+    radial-gradient(1000px 600px at 80% 0%, rgba(255,50,70,.25), transparent 70%),
+    radial-gradient(1200px 900px at 40% 100%, rgba(85,0,0,.45), transparent 75%),
+    linear-gradient(180deg, #050304, var(--bg-2));
+  background-attachment: fixed;
+}
+
+body::before{
+  content:"";
+  position:fixed;
+  inset:0;
+  background:
+    url('https://www.transparenttextures.com/patterns/dark-denim-3.png');
+  opacity:.12;
+  pointer-events:none;
+}
+
+.app{
+  min-height:100%;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+  align-items:center;
+  padding:24px 16px 40px;
+}
+
+.header{
+  width:100%;
+  max-width:860px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:12px;
+}
+.header h1{
+  margin:0;
+  font-weight:800;
+  letter-spacing:-0.5px;
+  background: linear-gradient(90deg, var(--accent-3), var(--accent-2));
+  -webkit-background-clip:text;
+  background-clip:text;
+  color:transparent;
+  text-shadow:0 10px 25px rgba(255,93,42,.25);
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+.stat{
+  background:rgba(55,24,19,.65);
+  border:1px solid var(--panel-border);
+  padding:8px 10px;
+  border-radius:10px;
+  display:flex;
+  gap:6px;
+  align-items:center;
+}
+.stat strong{
+  color:var(--accent-3);
+}
+
+.btn{
+  cursor:pointer;
+  border:none;
+  border-radius:10px;
+  padding:10px 12px;
+  background:var(--button);
+  color:var(--fg);
+  border:1px solid var(--button-border);
+  transition: all .15s ease;
+  text-shadow:0 0 14px rgba(255,106,45,.45);
+}
+.btn:hover{
+  transform: translateY(-1px);
+  background:#341c1b;
+}
+.btn-primary{
+  background: linear-gradient(180deg, #ff9f43, #ff5d2a);
+  color:#1a0606;
+  border:1px solid rgba(255,167,90,.8);
+  box-shadow: 0 6px 22px rgba(255,130,55,.35);
+}
+.btn-primary:hover{
+  filter: brightness(1.08);
+}
+
+.board-wrap{
+  position:relative;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:16px;
+}
+
+canvas#board{
+  width: min(92vw, 560px);
+  height: min(92vw, 560px);
+  image-rendering: pixelated;
+  border-radius:16px;
+  background:
+    linear-gradient(180deg, rgba(255,140,66,.08), rgba(255,73,35,.05)),
+    radial-gradient(580px 260px at 40% 0%, rgba(255,110,45,.2), transparent 70%),
+    linear-gradient(190deg, #1a0808, #090203 68%, #160606);
+  box-shadow:
+    0 0 0 1px rgba(255,87,34,.15),
+    0 18px 40px rgba(0,0,0,.6),
+    inset 0 0 60px rgba(255,87,34,.18);
+  position:relative;
+}
+
+.mobile-controls{
+  display:grid;
+  grid-template-areas:
+    ". up ."
+    "left . right"
+    ". down .";
+  grid-template-columns: repeat(3, 64px);
+  grid-template-rows: repeat(3, 64px);
+  gap:10px;
+  user-select:none;
+}
+.pad{
+  background:rgba(64,22,18,.65);
+  border:1px solid rgba(255,117,54,.35);
+  border-radius:14px;
+  color:var(--fg);
+  font-size:20px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  backdrop-filter: blur(6px);
+}
+.pad:active{
+  transform:scale(.98);
+}
+.pad.up{ grid-area: up; }
+.pad.left{ grid-area: left; }
+.pad.right{ grid-area: right; }
+.pad.down{ grid-area: down; }
+
+.help{
+  width:100%;
+  max-width:860px;
+}
+.help details{
+  background:rgba(64,24,22,.65);
+  border:1px solid rgba(255,119,51,.25);
+  padding:10px 14px;
+  border-radius:12px;
+}
+.help summary{
+  cursor:pointer;
+  font-weight:600;
+}
+.help ul{
+  margin:8px 0 0;
+  padding-right:18px;
+  line-height:1.8;
+  opacity:.9;
+}
+
+@media (min-width: 700px){
+  .mobile-controls{ display:none; }
+}
+
+

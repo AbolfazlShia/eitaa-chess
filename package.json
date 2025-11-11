@@ -1,0 +1,15 @@
+{
+  "name": "eitaa-chess",
+  "private": true,
+  "version": "0.1.0",
+  "description": "A modern Persian-themed online chess game with Eitaa bot integration",
+  "scripts": {
+    "dev": "concurrently -n server,web -c blue,green \"pnpm --filter server dev\" \"pnpm --filter web dev\"",
+    "build": "pnpm --filter server build && pnpm --filter web build",
+    "start": "pnpm --filter server start"
+  },
+  "devDependencies": {
+    "concurrently": "^9.0.1"
+  }
+}
+

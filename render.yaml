@@ -1,0 +1,15 @@
+services:
+  - type: web
+    name: eitaa-chess-backend
+    env: node
+    plan: free
+    buildCommand: cd server && pnpm install && pnpm build
+    startCommand: cd server && pnpm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: DAILY_LIVE_CAP
+        value: 10
+
