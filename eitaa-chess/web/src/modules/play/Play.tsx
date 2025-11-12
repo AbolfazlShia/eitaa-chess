@@ -36,6 +36,7 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 	const [selected, setSelected] = useState<string | null>(null);
 	const [status, setStatus] = useState<string>('در حال آماده‌سازی…');
 	const [aiLevel, setAiLevel] = useState<number>(3);
+	const [showDifficultyModal, setShowDifficultyModal] = useState<boolean>(false);
 	const [opponent, setOpponent] = useState<{ name: string; avatarUrl?: string } | null>(null);
 	const [isMyTurn, setIsMyTurn] = useState<boolean>(true);
 	const [myColor, setMyColor] = useState<'w' | 'b'>('w');
@@ -86,6 +87,10 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 			setStatus('نوبت شما');
 			setIsMyTurn(true);
 			setMyColor('w');
+			// show difficulty picker at game start for single-player
+			if (route.mode === 'single') {
+				setShowDifficultyModal(true);
+			}
 			return;
 		}
 
@@ -186,6 +191,7 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 	// AI move - Fixed with proper dependency management
 	useEffect(() => {
 		if (route.mode !== 'single') return;
+		if (showDifficultyModal) return; // wait until difficulty chosen
 		if (gameOver) return;
 		if (isMyTurn) return;
 		if (gameStatus.turn !== 'b') return;
@@ -453,6 +459,21 @@ export const Play: React.FC<Props> = ({ route, goHome, socket, userInfo }) => {
 					</div>
 				</div>
 			</div>
+
+			{route.mode === 'single' && showDifficultyModal && (
+				<div className="game-over-modal" role="dialog" aria-modal="true">
+					<div className="game-over-content" style={{ maxWidth: 420 }}>
+						<div className="game-over-title">انتخاب درجه سختی</div>
+						<div style={{ display: 'grid', gap: 10 }}>
+							<button className="btn-primary" onClick={() => { setAiLevel(1); setShowDifficultyModal(false); setStatus('نوبت شما'); }}>آسان</button>
+							<button className="btn-primary" onClick={() => { setAiLevel(2); setShowDifficultyModal(false); setStatus('نوبت شما'); }}>متوسط-</button>
+							<button className="btn-primary" onClick={() => { setAiLevel(3); setShowDifficultyModal(false); setStatus('نوبت شما'); }}>متوسط</button>
+							<button className="btn-primary" onClick={() => { setAiLevel(4); setShowDifficultyModal(false); setStatus('نوبت شما'); }}>سخت</button>
+							<button className="btn-primary" onClick={() => { setAiLevel(5); setShowDifficultyModal(false); setStatus('نوبت شما'); }}>خیلی سخت</button>
+						</div>
+					</div>
+				</div>
+			)}
 		</div>
 	);
 };

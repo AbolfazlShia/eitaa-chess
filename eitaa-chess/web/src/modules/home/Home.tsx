@@ -141,9 +141,29 @@ export const Home: React.FC<Props> = ({ onStart, socket, userInfo }) => {
 								<div className="tag" style={{ direction: 'ltr', wordBreak: 'break-all', marginBottom: '12px' }}>
 									{inviteLink}
 								</div>
-								<button onClick={() => navigator.clipboard.writeText(inviteLink)}>
-									📋 کپی لینک
-								</button>
+								<div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+									<button onClick={() => navigator.clipboard.writeText(inviteLink)}>
+										📋 کپی لینک
+									</button>
+									<button onClick={async () => {
+										try {
+											if (navigator.share) {
+												await navigator.share({
+													title: 'دعوت به بازی شطرنج هخامنشی',
+													text: 'بیا با هم بازی کنیم! 👑♟️',
+													url: inviteLink
+												});
+											} else {
+												await navigator.clipboard.writeText(inviteLink);
+												alert('لینک در کلیپ‌بورد کپی شد');
+											}
+										} catch (e) {
+											console.error('share failed', e);
+										}
+									}}>
+										🔗 اشتراک‌گذاری
+									</button>
+								</div>
 								<button
 									onClick={() => setInviteId(null)}
 									style={{ marginTop: '8px', background: 'var(--panel)', borderColor: 'var(--accent)' }}
